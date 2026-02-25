@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Task Manager UI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f7;
+      color: #111827;
+    }
+    header {
+      background: #111827;
+      color: #f9fafb;
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+    main {
+      max-width: 960px;
+      margin: 1.5rem auto;
+      padding: 0 1rem 2rem;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 0.75rem;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .card h2 {
+      margin-top: 0;
+      font-size: 1.1rem;
+      margin-bottom: 0.75rem;
+    }
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #4b5563;
+      margin-bottom: 0.25rem;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.5rem;
+      border: 1px solid #d1d5db;
+      font-size: 0.9rem;
+      box-sizing: border-box;
+      margin-bottom: 0.75rem;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 0.45rem 1rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .btn-primary {
+      background: #2563eb;
+      color: #f9fafb;
+    }
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+    .btn-danger {
+      background: #dc2626;
+      color: #f9fafb;
+    }
+    .btn-small {
+      padding: 0.25rem 0.6rem;
+      font-size: 0.8rem;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .col {
+      flex: 1 1 260px;
+    }
+    .tasks-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .task-item {
+      border-radius: 0.75rem;
+      border: 1px solid #e5e7eb;
+      padding: 0.75rem 0.9rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      background: #f9fafb;
+    }
+    .task-main {
+      flex: 1;
+      margin-right: 0.5rem;
+    }
+    .task-title {
+      margin: 0;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .task-meta {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 0.15rem;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 0.1rem 0.6rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .chip-success {
+      background: #dcfce7;
+      color: #166534;
+    }
+    .chip-muted {
+      background: #e5e7eb;
+      color: #374151;
+    }
+    .status-bar {
+      font-size: 0.8rem;
+      color: #374151;
+    }
+    .status-bar span {
+      margin-right: 1rem;
+    }
+    .mt-1 { margin-top: 0.25rem; }
+    .mt-2 { margin-top: 0.5rem; }
+    .mt-3 { margin-top: 0.75rem; }
+    .flex { display: flex; }
+    .justify-between { justify-content: space-between; }
+    .gap-1 { gap: 0.25rem; }
+    .text-danger { color: #b91c1c; }
+    .text-muted { color: #6b7280; }
+    .badge {
+      background: #1f2937;
+      color: #f9fafb;
+      border-radius: 999px;
+      padding: 0.15rem 0.65rem;
+      font-size: 0.75rem;
+    }
+    @media (max-width: 640px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+      }
+      .status-bar span {
+        display: block;
+        margin-bottom: 0.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Task Manager</h1>
+    <div class="status-bar">
+      <span id="authStatus" class="text-muted">Not authenticated</span>
+      <span id="userStatus" class="badge" style="display:none;"></span>
+    </div>
+  </header>
+
+  <main>
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <h2>Register</h2>
+          <label for="regUsername">Username</label>
+          <input id="regUsername" type="text" placeholder="johndoe" />
+
+          <label for="regEmail">Email</label>
+          <input id="regEmail" type="email" placeholder="john@example.com" />
+
+          <label for="regPassword">Password</label>
+          <input id="regPassword" type="password" />
+
+          <label for="regPassword2">Confirm Password</label>
+          <input id="regPassword2" type="password" />
+
+          <button class="btn-secondary" id="registerBtn">Sign up</button>
+        </div>
+
+        <div class="card">
+          <h2>Login</h2>
+          <label for="loginUsername">Username</label>
+          <input id="loginUsername" type="text" />
+
+          <label for="loginPassword">Password</label>
+          <input id="loginPassword" type="password" />
+
+          <button class="btn-primary" id="loginBtn">Login</button>
+          <button class="btn-secondary" id="logoutBtn">Logout</button>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card">
+          <h2>Create task</h2>
+          <label for="taskTitle">Title</label>
+          <input id="taskTitle" type="text" placeholder="Write documentation" />
+
+          <label for="taskDescription">Description</label>
+          <textarea id="taskDescription" placeholder="Optional details"></textarea>
+
+          <label>
+            <input id="taskCompleted" type="checkbox" />
+            Mark as completed
+          </label>
+
+          <button class="btn-primary" id="createTaskBtn">Add task</button>
+        </div>
+
+        <div class="card">
+          <h2>Tasks</h2>
+          <div class="flex justify-between mt-1">
+            <div class="flex gap-1">
+              <select id="filterCompleted">
+                <option value="">All</option>
+                <option value="true">Completed</option>
+                <option value="false">Pending</option>
+              </select>
+              <input id="searchText" type="text" placeholder="Search…" />
+            </div>
+            <button class="btn-secondary btn-small" id="reloadTasksBtn">Reload</button>
+          </div>
+          <p class="mt-2 text-muted" id="tasksInfo"></p>
+          <ul class="tasks-list mt-2" id="tasksList"></ul>
+          <div class="flex justify-between mt-2" id="paginationControls">
+            <button class="btn-secondary btn-small" id="prevPageBtn">Previous</button>
+            <span class="text-muted" id="pageDisplay"></span>
+            <button class="btn-secondary btn-small" id="nextPageBtn">Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Status</h2>
+      <p id="message" class="text-muted">Ready.</p>
+    </div>
+  </main>
+
+  <script>
+    const API_BASE = "/api";
+
+    const messageEl = document.getElementById("message");
+    const authStatusEl = document.getElementById("authStatus");
+    const userStatusEl = document.getElementById("userStatus");
+    const tasksListEl = document.getElementById("tasksList");
+    const tasksInfoEl = document.getElementById("tasksInfo");
+    const pageDisplayEl = document.getElementById("pageDisplay");
+    const prevPageBtn = document.getElementById("prevPageBtn");
+    const nextPageBtn = document.getElementById("nextPageBtn");
+
+    let accessToken = null;
+    let currentUser = null;
+    let currentPage = 1;
+    let totalPages = 1;
+
+    function setMessage(text, isError = false) {
+      messageEl.textContent = text;
+      messageEl.className = isError ? "text-danger" : "text-muted";
+    }
+
+    function updateAuthStatus() {
+      if (accessToken && currentUser) {
+        authStatusEl.textContent = `Authenticated as ${currentUser.username}`;
+        authStatusEl.className = "";
+        userStatusEl.style.display = "inline-flex";
+        userStatusEl.textContent = currentUser.role || "user";
+      } else {
+        authStatusEl.textContent = "Not authenticated";
+        authStatusEl.className = "text-muted";
+        userStatusEl.style.display = "none";
+      }
+    }
+
+    function authHeaders() {
+      return accessToken
+        ? { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" }
+        : { "Content-Type": "application/json" };
+    }
+
+    async function registerUser() {
+      const usernameInput = document.getElementById("regUsername");
+      const emailInput = document.getElementById("regEmail");
+      const passwordInput = document.getElementById("regPassword");
+      const password2Input = document.getElementById("regPassword2");
+
+      const username = usernameInput.value.trim();
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      const password2 = password2Input.value;
+      setMessage("Registering user…");
+      try {
+        const res = await fetch(`${API_BASE}/auth/register/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, email, password, password2 }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(JSON.stringify(data));
+        }
+        setMessage("User registered. You can now log in.");
+        // Clear registration form fields on successful registration
+        usernameInput.value = "";
+        emailInput.value = "";
+        passwordInput.value = "";
+        password2Input.value = "";
+      } catch (err) {
+        setMessage(`Registration failed: ${err.message}`, true);
+      }
+    }
+
+    async function loginUser() {
+      const usernameInput = document.getElementById("loginUsername");
+      const passwordInput = document.getElementById("loginPassword");
+
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value;
+      setMessage("Logging in…");
+      try {
+        const res = await fetch(`${API_BASE}/auth/login/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(JSON.stringify(data));
+        }
+        accessToken = data.access;
+        currentUser = data.user || null;
+        updateAuthStatus();
+        setMessage("Logged in.");
+        // Clear login form fields on successful login
+        usernameInput.value = "";
+        passwordInput.value = "";
+        await loadTasks();
+      } catch (err) {
+        setMessage(`Login failed: ${err.message}`, true);
+      }
+    }
+
+    function logoutUser() {
+      accessToken = null;
+      currentUser = null;
+      updateAuthStatus();
+      tasksListEl.innerHTML = "";
+      tasksInfoEl.textContent = "";
+      setMessage("Logged out.");
+    }
+
+    async function createTask() {
+      if (!accessToken) {
+        setMessage("You must be logged in to create tasks.", true);
+        return;
+      }
+      const title = document.getElementById("taskTitle").value.trim();
+      const description = document.getElementById("taskDescription").value.trim();
+      const completed = document.getElementById("taskCompleted").checked;
+      if (!title) {
+        setMessage("Title is required.", true);
+        return;
+      }
+      setMessage("Creating task…");
+      try {
+        const res = await fetch(`${API_BASE}/tasks/`, {
+          method: "POST",
+          headers: authHeaders(),
+          body: JSON.stringify({ title, description, completed }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(JSON.stringify(data));
+        }
+        document.getElementById("taskTitle").value = "";
+        document.getElementById("taskDescription").value = "";
+        document.getElementById("taskCompleted").checked = false;
+        setMessage("Task created.");
+        await loadTasks();
+      } catch (err) {
+        setMessage(`Create task failed: ${err.message}`, true);
+      }
+    }
+
+    async function toggleTaskCompleted(task) {
+      if (!accessToken) return;
+      const updated = {
+        title: task.title,
+        description: task.description,
+        completed: !task.completed,
+      };
+      setMessage("Updating task…");
+      try {
+        const res = await fetch(`${API_BASE}/tasks/${task.id}/`, {
+          method: "PUT",
+          headers: authHeaders(),
+          body: JSON.stringify(updated),
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(JSON.stringify(data));
+        }
+        setMessage("Task updated.");
+        await loadTasks();
+      } catch (err) {
+        setMessage(`Update failed: ${err.message}`, true);
+      }
+    }
+
+    async function deleteTask(taskId) {
+      if (!accessToken) return;
+      if (!confirm("Delete this task?")) return;
+      setMessage("Deleting task…");
+      try {
+        const res = await fetch(`${API_BASE}/tasks/${taskId}/`, {
+          method: "DELETE",
+          headers: authHeaders(),
+        });
+        if (res.status !== 204) {
+          const data = await res.json();
+          throw new Error(JSON.stringify(data));
+        }
+        setMessage("Task deleted.");
+        await loadTasks();
+      } catch (err) {
+        setMessage(`Delete failed: ${err.message}`, true);
+      }
+    }
+
+    function renderTasks(payload) {
+      const { results = [], count, current_page, total_pages } = payload;
+      tasksListEl.innerHTML = "";
+      currentPage = current_page || 1;
+      totalPages = total_pages || 1;
+      tasksInfoEl.textContent = `Total: ${count ?? results.length}`;
+      pageDisplayEl.textContent = `Page ${currentPage} of ${totalPages}`;
+      prevPageBtn.disabled = currentPage <= 1;
+      nextPageBtn.disabled = currentPage >= totalPages;
+      results.forEach((task) => {
+        const li = document.createElement("li");
+        li.className = "task-item";
+        const main = document.createElement("div");
+        main.className = "task-main";
+
+        const title = document.createElement("p");
+        title.className = "task-title";
+        title.textContent = task.title;
+        main.appendChild(title);
+
+        if (task.description) {
+          const desc = document.createElement("p");
+          desc.className = "text-muted mt-1";
+          desc.textContent = task.description;
+          main.appendChild(desc);
+        }
+
+        const meta = document.createElement("div");
+        meta.className = "task-meta mt-1";
+        meta.textContent = `Owner: ${task.user} • Created: ${new Date(task.created_at).toLocaleString()}`;
+        main.appendChild(meta);
+
+        const chip = document.createElement("span");
+        chip.className = "chip " + (task.completed ? "chip-success" : "chip-muted");
+        chip.textContent = task.completed ? "Completed" : "Pending";
+
+        const actions = document.createElement("div");
+        actions.className = "flex gap-1";
+        const toggleBtn = document.createElement("button");
+        toggleBtn.className = "btn-secondary btn-small";
+        toggleBtn.textContent = task.completed ? "Mark pending" : "Mark done";
+        toggleBtn.addEventListener("click", () => toggleTaskCompleted(task));
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "btn-danger btn-small";
+        deleteBtn.textContent = "Delete";
+        deleteBtn.addEventListener("click", () => deleteTask(task.id));
+
+        actions.appendChild(toggleBtn);
+        actions.appendChild(deleteBtn);
+
+        li.appendChild(main);
+        const right = document.createElement("div");
+        right.style.display = "flex";
+        right.style.flexDirection = "column";
+        right.style.alignItems = "flex-end";
+        right.appendChild(chip);
+        right.appendChild(actions);
+        li.appendChild(right);
+
+        tasksListEl.appendChild(li);
+      });
+    }
+
+    async function loadTasks() {
+      if (!accessToken) {
+        tasksListEl.innerHTML = "";
+        tasksInfoEl.textContent = "Login to see your tasks.";
+        return;
+      }
+      const filterCompleted = document.getElementById("filterCompleted").value;
+      const searchText = document.getElementById("searchText").value.trim();
+      const params = new URLSearchParams();
+      params.append("page", currentPage);
+      if (filterCompleted) params.append("completed", filterCompleted);
+      if (searchText) params.append("search", searchText);
+      setMessage("Loading tasks…");
+      try {
+        const res = await fetch(`${API_BASE}/tasks/?${params.toString()}`, {
+          headers: authHeaders(),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(JSON.stringify(data));
+        }
+        renderTasks(data);
+        setMessage("Tasks loaded.");
+      } catch (err) {
+        setMessage(`Load tasks failed: ${err.message}`, true);
+      }
+    }
+
+    document.getElementById("registerBtn").addEventListener("click", registerUser);
+    document.getElementById("loginBtn").addEventListener("click", loginUser);
+    document.getElementById("logoutBtn").addEventListener("click", logoutUser);
+    document.getElementById("createTaskBtn").addEventListener("click", createTask);
+    document.getElementById("reloadTasksBtn").addEventListener("click", () => {
+      currentPage = 1;
+      loadTasks();
+    });
+    document.getElementById("filterCompleted").addEventListener("change", () => {
+      currentPage = 1;
+      loadTasks();
+    });
+    document.getElementById("searchText").addEventListener("input", () => {
+      clearTimeout(window.__searchTimer);
+      window.__searchTimer = setTimeout(() => {
+        currentPage = 1;
+        loadTasks();
+      }, 300);
+    });
+    prevPageBtn.addEventListener("click", () => {
+      if (currentPage > 1) {
+        currentPage -= 1;
+        loadTasks();
+      }
+    });
+    nextPageBtn.addEventListener("click", () => {
+      if (currentPage < totalPages) {
+        currentPage += 1;
+        loadTasks();
+      }
+    });
+
+    setMessage("Ready. Register or log in to begin.");
+    updateAuthStatus();
+  </script>
+</body>
+</html>
+

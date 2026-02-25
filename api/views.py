@@ -63,8 +63,17 @@ class TaskListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         # Admin can see all tasks, regular users see only their own
         if hasattr(self.request.user, 'profile') and self.request.user.profile.role == 'admin':
-            return Task.objects.all()
-        return Task.objects.filter(user=self.request.user)
+            queryset = Task.objects.all()
+        else:
+            queryset = Task.objects.filter(user=self.request.user)
+
+        # Optional filtering by completed status using ?completed=true/false
+        completed_param = self.request.query_params.get('completed')
+        if completed_param is not None and completed_param != "":
+            completed_value = completed_param.lower() in ['true', '1', 'yes']
+            queryset = queryset.filter(completed=completed_value)
+
+        return queryset
     
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
